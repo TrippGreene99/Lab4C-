@@ -1,0 +1,208 @@
+using System;
+
+class Account
+{
+    private static int counter = 1000;
+    private int accountNumber;
+    private double balance;
+
+    public Account()
+    {
+        counter++;
+        this.accountNumber = counter;
+        this.balance = 0;
+    }
+
+    public Account(double balance)
+    {
+        this.balance = balance;
+        counter++;
+        this.accountNumber = counter;
+    }
+
+    //getter
+
+    public int getAccountNumber()
+    {
+        return accountNumber;
+    }
+
+    public double getBalance()
+    {
+        return balance;
+    }
+    //setter
+
+    public void setBalance(double balance)
+    {
+        this.balance = balance;
+    }
+
+    public void withdraw(double amount)
+    {
+        balance -= amount;
+    }
+
+    public void deposit(double amount)
+    {
+        balance += amount;
+    }
+
+
+    public override string ToString()
+    {
+        return "Your balance for " + GetType().Name + " " +
+               accountNumber +
+                " is $" + balance.ToString("F2");
+    }
+}
+
+class Checking : Account
+{
+    private const double OVERDRAFT_FEE = 20.00;
+    public Checking(double balance) : base(balance)
+    {
+
+    }
+    public Checking() : base()
+    {
+
+    }
+
+
+    public void withdraw(double amount)
+    {
+        if (getBalance() < 0)
+        {
+            setBalance(getBalance() - OVERDRAFT_FEE);
+            Console.WriteLine("Charging an overdraft fee of $" + OVERDRAFT_FEE + " because account is below $0");
+        }
+        base.withdraw(amount);
+    }
+
+}
+
+
+
+class Savings : Account
+{
+    private const double FEE = 10.00,
+    INTEREST = 0.015;/
+    private int counter = 0;
+
+    public Savings() : base()
+    {
+
+    }
+
+    public Savings(double balance) : base(balance)
+    {
+
+    }
+
+
+    public void withdraw(double amount)
+    {
+
+        if (getBalance() < 500.00)
+        {
+            Console.WriteLine("Charging a fee of $" + FEE + " because you are below $500");
+            setBalance(getBalance() - FEE);
+        }
+
+        base.withdraw(amount);
+
+    }
+
+
+    public void deposit(double amount)
+    {
+        counter++;
+        Console.WriteLine("This is deposit " + counter + " to this account.");
+        if (counter > 5)
+        {
+            Console.WriteLine("Charging a Fee of $" + FEE);
+            setBalance(getBalance() - FEE);
+        }
+
+        base.deposit(amount);
+
+    }
+
+    public void earnInterest()
+    {
+        double interest = getBalance() * INTEREST;
+        Console.WriteLine("Customer earned $" + String.Format("%.2f", interest) + " in interest");
+        setBalance(getBalance() + interest);
+    }
+
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Checking checking = new Checking(0);
+        Savings savings = new Savings(0);
+        int choice;
+        double amount;
+        do
+        {
+            choice = userMenu();
+            Console.WriteLine();
+            switch (choice)
+            {
+                case 1:
+                    Console.Write("How much would you like to withdraw from Checking? ");
+                    amount = double.Parse(Console.ReadLine());
+                    checking.withdraw(amount);
+                    break;
+                case 2:
+                    Console.Write("How much would you like to withdraw from Savings? ");
+                    amount = double.Parse(Console.ReadLine());
+                    savings.withdraw(amount);
+                    break;
+                case 3:
+                    Console.Write("How much would you like to deposit into Checking? ");
+                    amount = double.Parse(Console.ReadLine());
+                    checking.deposit(amount);
+                    break;
+                case 4:
+                    Console.Write("How much would you like to deposit into Savings? ");
+                    amount = double.Parse(Console.ReadLine());
+                    savings.deposit(amount);
+                    break;
+                case 5:
+                    Console.WriteLine(checking);
+                    break;
+                case 6:
+                    Console.WriteLine(savings);
+
+                    break;
+                case 7:
+                    savings.earnInterest();
+                    break;
+                case 8:
+                    Console.WriteLine("Thanks for using this app.");
+                    break;
+                default:
+                    Console.WriteLine("Wrong choice...Try Again.");
+                    break;
+            }
+        } while (choice != 8);
+    }
+
+    public static int userMenu()
+    {
+        Console.Write("1. Withdraw from Checking\n2. Withdraw from Savings\n3. Deposit to Checking" +
+                "\n4. Deposit to Savings\n5. Balance Of checking\n6. Balance of savings" +
+                "\n7. Award Interest to savings now\n8. Quit\nEnter your choice: ");
+
+        return int.Parse(Console.ReadLine());
+    }
+
+}
+
+
+
+
